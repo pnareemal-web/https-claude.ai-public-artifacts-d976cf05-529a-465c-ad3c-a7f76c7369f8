@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard รายงานผลโครงการ NSO ปีงบประมาณ 2569 — โรงพยาบาลธัญญารักษ์ปัตตานี</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --navy:        #0d2d5e;
+  --navy-mid:    #1a4280;
+  --navy-light:  #2560a8;
+  --accent:      #1e73d2;
+  --accent2:     #3a9bd5;
+  --gold:        #d4961a;
+  --gold-light:  #f5c842;
+  --success:     #1e8f5e;
+  --success-light:#25b378;
+  --warning:     #d97706;
+  --danger:      #c0392b;
+  --white:       #ffffff;
+  --bg:          #f0f3f8;
+  --surface:     #ffffff;
+  --border:      #dce3ef;
+  --text-main:   #1a2744;
+  --text-sub:    #5a6d8a;
+  --text-muted:  #96a4b8;
+  --shadow:      0 2px 12px rgba(13,45,94,.09);
+  --shadow-md:   0 6px 24px rgba(13,45,94,.14);
+  --r:           12px;
+  --r-sm:        8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text-main);font-size:13.5px;min-height:100vh;}
+@media print{body{background:white}.no-print{display:none!important}.card{box-shadow:none!important;border:1px solid #ddd!important}}
+
+/* ── HEADER ── */
+.header{
+  background:linear-gradient(120deg,#092248 0%,#0d2d5e 45%,#1a4280 100%);
+  color:#fff;padding:0;
+  position:sticky;top:0;z-index:200;
+  box-shadow:0 3px 20px rgba(9,34,72,.45);
+}
+.header-inner{display:flex;align-items:center;justify-content:space-between;padding:12px 28px;gap:16px;}
+.hd-logo{display:flex;align-items:center;gap:13px;}
+.hd-emblem{
+  width:48px;height:48px;border-radius:10px;
+  background:linear-gradient(135deg,#2560a8,#d4961a);
+  display:flex;align-items:center;justify-content:center;font-size:24px;
+  flex-shrink:0;
+}
+.hd-text h1{font-size:15px;font-weight:700;line-height:1.35;letter-spacing:.2px;}
+.hd-text p{font-size:11px;opacity:.7;margin-top:2px;}
+.hd-right{display:flex;align-items:center;gap:14px;}
+.badge-fy{
+  background:var(--gold);color:#fff;
+  font-weight:700;font-size:13px;padding:5px 16px;border-radius:20px;
+  letter-spacing:.5px;white-space:nowrap;
+}
+.hd-timestamp{font-size:11px;opacity:.6;text-align:right;line-height:1.6;}
+.btn-hd{
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);
+  color:#fff;padding:6px 13px;border-radius:6px;
+  cursor:pointer;font-family:'Sarabun',sans-serif;font-size:12px;
+  display:flex;align-items:center;gap:5px;transition:.2s;white-space:nowrap;
+}
+.btn-hd:hover{background:rgba(255,255,255,.22);}
+
+/* ── FILTER BAR ── */
+.filter-bar{
+  background:#fff;border-bottom:1px solid var(--border);
+  padding:9px 28px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+}
+.flabel{font-size:11px;font-weight:700;color:var(--text-sub);white-space:nowrap;}
+.filter-bar select,.filter-bar input[type=text]{
+  border:1px solid var(--border);border-radius:6px;
+  padding:5px 10px;font-family:'Sarabun',sans-serif;font-size:12px;
+  color:var(--text-main);background:var(--bg);outline:none;transition:.2s;
+}
+.filter-bar select:focus,.filter-bar input:focus{border-color:var(--accent);}
+.search-wrap{position:relative;}
+.search-wrap input{padding-left:26px;min-width:170px;}
+.si{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text-muted);}
+.btn-reset{
+  background:none;border:1px solid var(--border);border-radius:6px;
+  padding:5px 11px;font-family:'Sarabun',sans-serif;font-size:12px;
+  color:var(--text-sub);cursor:pointer;transition:.2s;
+}
+.btn-reset:hover{border-color:var(--accent);color:var(--accent);}
+.btn-export{
+  margin-left:auto;background:var(--navy);color:#fff;border:none;
+  border-radius:6px;padding:6px 16px;font-family:'Sarabun',sans-serif;
+  font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:.2s;
+}
+.btn-export:hover{background:var(--navy-light);}
+
+/* ── MAIN LAYOUT ── */
+.main{padding:18px 28px 32px;max-width:1700px;margin:0 auto;}
+
+/* ── SECTION LABEL ── */
+.slabel{
+  font-size:10.5px;font-weight:700;text-transform:uppercase;
+  letter-spacing:1.2px;color:var(--text-muted);
+  margin-bottom:11px;display:flex;align-items:center;gap:8px;
+}
+.slabel::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ── KPI GRID ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:11px;margin-bottom:18px;}
+.kpi{
+  background:var(--surface);border-radius:var(--r);
+  padding:15px 14px 13px;box-shadow:var(--shadow);
+  border-top:3px solid transparent;transition:.25s;position:relative;overflow:hidden;
+}
+.kpi:hover{box-shadow:var(--shadow-md);transform:translateY(-2px);}
+.kpi::after{
+  content:'';position:absolute;top:0;right:0;
+  width:54px;height:54px;border-radius:0 0 0 54px;opacity:.07;
+}
+.kpi.c-blue{border-top-color:var(--accent);}        .kpi.c-blue::after{background:var(--accent);}
+.kpi.c-green{border-top-color:var(--success);}      .kpi.c-green::after{background:var(--success);}
+.kpi.c-yellow{border-top-color:var(--warning);}     .kpi.c-yellow::after{background:var(--warning);}
+.kpi.c-red{border-top-color:var(--danger);}         .kpi.c-red::after{background:var(--danger);}
+.kpi.c-gold{border-top-color:var(--gold);}          .kpi.c-gold::after{background:var(--gold);}
+.kpi.c-navy{border-top-color:var(--navy);}          .kpi.c-navy::after{background:var(--navy);}
+.kpi.c-teal{border-top-color:#0d9488;}              .kpi.c-teal::after{background:#0d9488;}
+.kpi-ico{font-size:19px;margin-bottom:6px;}
+.kpi-val{
+  font-family:'IBM Plex Sans Thai',sans-serif;
+  font-size:30px;font-weight:700;line-height:1;margin-bottom:3px;
+}
+.kpi.c-blue .kpi-val{color:var(--accent);}
+.kpi.c-green .kpi-val{color:var(--success);}
+.kpi.c-yellow .kpi-val{color:var(--warning);}
+.kpi.c-red .kpi-val{color:var(--danger);}
+.kpi.c-gold .kpi-val{color:var(--gold);}
+.kpi.c-navy .kpi-val{color:var(--navy-mid);}
+.kpi.c-teal .kpi-val{color:#0d9488;}
+.kpi-unit{font-size:13px;font-weight:500;margin-left:2px;}
+.kpi-name{font-size:11px;color:var(--text-sub);line-height:1.4;margin-top:3px;}
+.kpi-sub{font-size:10px;color:var(--text-muted);margin-top:4px;}
+
+/* ── ALERT STRIP ── */
+.alert-strip{
+  background:#fff8e6;border:1px solid #f5d584;border-left:4px solid var(--warning);
+  border-radius:8px;padding:9px 16px;margin-bottom:16px;
+  display:flex;align-items:center;gap:10px;font-size:12px;
+}
+.alert-strip .a-ico{font-size:16px;}
+.alert-strip strong{color:var(--text-main);}
+.alert-strip span{color:var(--text-sub);}
+
+/* ── CARD ── */
+.card{background:var(--surface);border-radius:var(--r);box-shadow:var(--shadow);padding:18px 20px;}
+.card-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:3px;display:flex;align-items:center;gap:6px;}
+.card-sub{font-size:11px;color:var(--text-muted);margin-bottom:14px;}
+
+/* ── GRID ROWS ── */
+.row-2{display:grid;grid-template-columns:1fr 1.7fr;gap:14px;margin-bottom:14px;}
+.row-3{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:14px;margin-bottom:14px;}
+.row-full{margin-bottom:14px;}
+
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto;margin-top:4px;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+thead th{
+  background:var(--navy);color:#fff;padding:9px 11px;
+  text-align:left;font-weight:600;font-size:11px;white-space:nowrap;
+}
+thead th:first-child{border-radius:8px 0 0 0;}
+thead th:last-child{border-radius:0 8px 0 0;}
+tbody tr{border-bottom:1px solid #eef1f7;transition:.15s;}
+tbody tr:hover{background:#f5f8ff;}
+tbody td{padding:8px 11px;vertical-align:middle;line-height:1.4;}
+.td-id{font-weight:700;color:var(--navy-mid);text-align:center;}
+.td-name{max-width:280px;font-weight:500;color:var(--text-main);}
+.td-name small{display:block;color:var(--text-muted);font-weight:400;font-size:10.5px;margin-top:1px;}
+.td-unit{font-size:11px;color:var(--text-sub);}
+.td-budget{font-weight:600;color:var(--navy-mid);text-align:right;white-space:nowrap;}
+.td-level{text-align:center;}
+.level-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:26px;height:26px;border-radius:50%;font-weight:700;font-size:12px;color:#fff;
+}
+.lv1{background:#e5e7eb;color:#555;}
+.lv2{background:#93c5fd;color:#1e40af;}
+.lv3{background:#fbbf24;color:#78350f;}
+.lv4{background:#6ee7b7;color:#065f46;}
+.lv5{background:#86efac;color:#14532d;}
+
+/* Progress in table */
+.mini-bar{display:flex;align-items:center;gap:7px;}
+.mini-track{flex:1;height:6px;background:#e8edf6;border-radius:10px;overflow:hidden;min-width:60px;}
+.mini-fill{height:100%;border-radius:10px;}
+.fill-green{background:linear-gradient(90deg,#1e8f5e,#25b378);}
+.fill-yellow{background:linear-gradient(90deg,#d97706,#f59e0b);}
+.fill-red{background:linear-gradient(90deg,#c0392b,#e74c3c);}
+.fill-blue{background:linear-gradient(90deg,#1e73d2,#3a9bd5);}
+.mini-pct{font-size:11px;font-weight:700;white-space:nowrap;}
+
+/* Status badge */
+.status-badge{
+  display:inline-block;padding:3px 10px;border-radius:20px;
+  font-size:10.5px;font-weight:600;white-space:nowrap;
+}
+.sb-success{background:#d1fae5;color:#065f46;}
+.sb-warning{background:#fef3c7;color:#92400e;}
+.sb-danger{background:#fee2e2;color:#991b1b;}
+.sb-info{background:#dbeafe;color:#1e40af;}
+
+/* ── BUDGET PROGRESS ── */
+.bgt-list{display:flex;flex-direction:column;gap:12px;}
+.bgt-row{}
+.bgt-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+.bgt-name{font-size:11px;font-weight:600;color:var(--navy);max-width:220px;line-height:1.3;}
+.bgt-pct{font-size:11px;font-weight:700;}
+.bgt-track{height:8px;background:#eef1f7;border-radius:10px;overflow:hidden;}
+.bgt-fill{height:100%;border-radius:10px;transition:width 1.2s ease;}
+.bgt-amts{font-size:10px;color:var(--text-muted);margin-top:3px;display:flex;justify-content:space-between;}
+
+/* ── DONUT LEGEND ── */
+.donut-legend{display:flex;flex-direction:column;gap:8px;margin-top:10px;}
+.dl-item{display:flex;align-items:center;gap:8px;font-size:12px;}
+.dl-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;}
+.dl-label{flex:1;color:var(--text-sub);}
+.dl-val{font-weight:700;color:var(--text-main);}
+
+/* ── LEVEL BAR LABELS ── */
+.level-wrap{position:relative;}
+
+/* ── FOOTER ── */
+.footer{
+  background:var(--navy);color:rgba(255,255,255,.6);
+  text-align:center;padding:12px 28px;font-size:11px;margin-top:8px;
+}
+
+/* scrollbar */
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:#f0f3f8;}
+::-webkit-scrollbar-thumb{background:#c5cfe0;border-radius:5px;}
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<header class="header">
+  <div class="header-inner">
+    <div class="hd-logo">
+      <div class="hd-emblem">🏥</div>
+      <div class="hd-text">
+        <h1>Dashboard รายงานผลโครงการ NSO ปีงบประมาณ 2569</h1>
+        <p>ภารกิจด้านการพยาบาล — โรงพยาบาลธัญญารักษ์ปัตตานี</p>
+      </div>
+    </div>
+    <div class="hd-right">
+      <span class="badge-fy">ปีงบประมาณ 2569</span>
+      <div class="hd-timestamp">อัปเดตล่าสุด<br id="dt-display">—</div>
+      <button class="btn-hd" onclick="location.reload()">🔄 Refresh</button>
+    </div>
+  </div>
+</header>
+
+<!-- ═══ FILTER BAR ═══ -->
+<div class="filter-bar no-print">
+  <span class="flabel">🔍 กรองข้อมูล</span>
+  <div class="search-wrap">
+    <span class="si">🔎</span>
+    <input type="text" id="searchBox" placeholder="ค้นหาโครงการ..." oninput="applyFilters()">
+  </div>
+  <select id="fUnit" onchange="applyFilters()">
+    <option value="">ทุกหน่วยงาน</option>
+  </select>
+  <select id="fStatus" onchange="applyFilters()">
+    <option value="">ทุกสถานะ</option>
+    <option value="ดำเนินการสำเร็จ">✅ ดำเนินการสำเร็จ</option>
+    <option value="อยู่ระหว่าง">⏳ อยู่ระหว่างดำเนินการ</option>
+    <option value="ปรับแผน">⚠️ ปรับแผน</option>
+  </select>
+  <select id="fLevel" onchange="applyFilters()">
+    <option value="">ทุกระดับความสำเร็จ</option>
+    <option value="2">ระดับ 2</option>
+    <option value="3">ระดับ 3</option>
+    <option value="4">ระดับ 4</option>
+    <option value="5">ระดับ 5</option>
+  </select>
+  <button class="btn-reset" onclick="resetFilters()">↺ รีเซ็ต</button>
+  <button class="btn-export" onclick="window.print()">📄 Export PDF</button>
+</div>
+
+<!-- ═══ MAIN ═══ -->
+<main class="main">
+
+  <!-- ALERT -->
+  <div class="alert-strip" id="alertStrip">
+    <span class="a-ico">⚠️</span>
+    <div>
+      <strong>โครงการที่ต้องติดตาม:</strong>
+      <span id="alertMsg">กำลังโหลด...</span>
+    </div>
+  </div>
+
+  <!-- 1. KPI SECTION -->
+  <div class="slabel">📊 สรุปภาพรวมโครงการ (Executive Summary)</div>
+  <div class="kpi-grid">
+    <div class="kpi c-navy">
+      <div class="kpi-ico">📋</div>
+      <div class="kpi-val">11</div>
+      <div class="kpi-name">โครงการทั้งหมด</div>
+      <div class="kpi-sub">ปีงบประมาณ 2569</div>
+    </div>
+    <div class="kpi c-green">
+      <div class="kpi-ico">✅</div>
+      <div class="kpi-val">9</div>
+      <div class="kpi-name">ดำเนินการสำเร็จตามห้วงเวลา</div>
+      <div class="kpi-sub">คิดเป็น 81.8%</div>
+    </div>
+    <div class="kpi c-yellow">
+      <div class="kpi-ico">⏳</div>
+      <div class="kpi-val">1</div>
+      <div class="kpi-name">รอการอนุมัติจากกรมฯ</div>
+      <div class="kpi-sub">โครงการที่ 2</div>
+    </div>
+    <div class="kpi c-red">
+      <div class="kpi-ico">⚠️</div>
+      <div class="kpi-val">1</div>
+      <div class="kpi-name">ปรับแผน / อยู่ระหว่างดำเนินการ</div>
+      <div class="kpi-sub">โครงการที่ 5</div>
+    </div>
+    <div class="kpi c-blue">
+      <div class="kpi-ico">🎯</div>
+      <div class="kpi-val">90.9<span class="kpi-unit">%</span></div>
+      <div class="kpi-name">ความสำเร็จตามห้วงเวลา</div>
+      <div class="kpi-sub">เกณฑ์ผ่าน ≥ 80%</div>
+    </div>
+    <div class="kpi c-gold">
+      <div class="kpi-ico">💰</div>
+      <div class="kpi-val">897<span class="kpi-unit">K</span></div>
+      <div class="kpi-name">งบประมาณรวม (บาท)</div>
+      <div class="kpi-sub">897,360 บาท</div>
+    </div>
+    <div class="kpi c-teal">
+      <div class="kpi-ico">📈</div>
+      <div class="kpi-val">3.5<span class="kpi-unit"></span></div>
+      <div class="kpi-name">ระดับความสำเร็จเฉลี่ย</div>
+      <div class="kpi-sub">จากคะแนนเต็ม 5</div>
+    </div>
+  </div>
+
+  <!-- 2. CHARTS ROW -->
+  <div class="row-2">
+    <!-- Donut Chart -->
+    <div class="card">
+      <div class="card-title">🍩 สถานะโครงการ</div>
+      <div class="card-sub">จำแนกตามสถานะการดำเนินงาน</div>
+      <div style="display:flex;align-items:center;gap:20px;">
+        <div style="width:160px;height:160px;flex-shrink:0;">
+          <canvas id="donutChart"></canvas>
+        </div>
+        <div class="donut-legend">
+          <div class="dl-item"><div class="dl-dot" style="background:#1e8f5e"></div><span class="dl-label">ดำเนินการสำเร็จตามห้วงเวลา</span><span class="dl-val">9</span></div>
+          <div class="dl-item"><div class="dl-dot" style="background:#d97706"></div><span class="dl-label">รอการอนุมัติจากกรมฯ</span><span class="dl-val">1</span></div>
+          <div class="dl-item"><div class="dl-dot" style="background:#c0392b"></div><span class="dl-label">ปรับแผน</span><span class="dl-val">1</span></div>
+        </div>
+      </div>
+      <div style="margin-top:14px;background:#f5f8ff;border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:11px;color:var(--text-sub)">อัตราความสำเร็จภาพรวม</span>
+        <span style="font-size:20px;font-weight:800;color:var(--success);font-family:'IBM Plex Sans Thai',sans-serif">90.9%</span>
+      </div>
+    </div>
+
+    <!-- Bar Chart: Level -->
+    <div class="card">
+      <div class="card-title">📊 ระดับความสำเร็จการบริหารโครงการ</div>
+      <div class="card-sub">จำนวนโครงการจำแนกตามระดับ (1–5)</div>
+      <canvas id="levelChart" style="max-height:190px;"></canvas>
+    </div>
+  </div>
+
+  <!-- 3. BUDGET ROW -->
+  <div class="row-3">
+    <!-- Budget Bar Chart -->
+    <div class="card">
+      <div class="card-title">💰 งบประมาณรายโครงการ</div>
+      <div class="card-sub">เปรียบเทียบงบประมาณ (บาท)</div>
+      <canvas id="budgetChart" style="max-height:200px;"></canvas>
+    </div>
+
+    <!-- Budget Progress -->
+    <div class="card">
+      <div class="card-title">📉 สัดส่วนงบประมาณรายโครงการ</div>
+      <div class="card-sub">ร้อยละจากงบรวมทั้งหมด</div>
+      <div class="bgt-list" id="budgetProgressList"></div>
+    </div>
+
+    <!-- Budget Summary -->
+    <div class="card">
+      <div class="card-title">🧾 สรุปงบประมาณภาพรวม</div>
+      <div class="card-sub">ปีงบประมาณ 2569</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px;">
+        <div style="background:#f5f8ff;border-radius:8px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.8px;">งบรวมทั้งหมด</div>
+            <div style="font-size:22px;font-weight:800;color:var(--navy);font-family:'IBM Plex Sans Thai',sans-serif;">897,360</div>
+            <div style="font-size:10px;color:var(--text-muted)">บาท</div>
+          </div>
+          <div style="font-size:28px;">💰</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div style="background:#d1fae5;border-radius:8px;padding:10px 12px;text-align:center;">
+            <div style="font-size:9px;color:#065f46;text-transform:uppercase;letter-spacing:.5px;">โครงการสำเร็จ</div>
+            <div style="font-size:20px;font-weight:800;color:#065f46;font-family:'IBM Plex Sans Thai',sans-serif;">9</div>
+            <div style="font-size:10px;color:#065f46;">โครงการ</div>
+          </div>
+          <div style="background:#fef3c7;border-radius:8px;padding:10px 12px;text-align:center;">
+            <div style="font-size:9px;color:#92400e;text-transform:uppercase;letter-spacing:.5px;">ต้องติดตาม</div>
+            <div style="font-size:20px;font-weight:800;color:#92400e;font-family:'IBM Plex Sans Thai',sans-serif;">2</div>
+            <div style="font-size:10px;color:#92400e;">โครงการ</div>
+          </div>
+        </div>
+        <div style="background:#f0f3f8;border-radius:8px;padding:10px 14px;">
+          <div style="font-size:10px;color:var(--text-muted);margin-bottom:6px;">สัดส่วนงบประมาณตามหน่วยงาน</div>
+          <canvas id="unitPieChart" style="max-height:90px;"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. TABLE -->
+  <div class="row-full">
+    <div class="card">
+      <div class="card-title">📋 ตารางสรุปโครงการทั้งหมด</div>
+      <div class="card-sub">แสดง <span id="rowCount">11</span> โครงการ — คลิกหัวตารางเพื่อเรียงลำดับ</div>
+      <div class="tbl-wrap">
+        <table id="projectTable">
+          <thead>
+            <tr>
+              <th style="text-align:center;width:36px;">รหัส</th>
+              <th>ชื่อโครงการ</th>
+              <th>หน่วยงาน</th>
+              <th>ผู้รับผิดชอบ</th>
+              <th style="text-align:right;">งบประมาณ (บาท)</th>
+              <th style="text-align:center;">ระดับ</th>
+              <th style="min-width:120px;">ความก้าวหน้า</th>
+              <th>สถานะ</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="footer">
+  รายงานผลโครงการ NSO ปีงบประมาณ 2569 | ภารกิจด้านการพยาบาล โรงพยาบาลธัญญารักษ์ปัตตานี | ข้อมูล ณ วันที่ <span id="ft-date"></span>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════
+// DATA — จากไฟล์ Excel จริง
+// ═══════════════════════════════════════════
+const PROJECTS = [
+  {id:1,unit:'กลุ่มงานวิชาการพยาบาล',name:'โครงการอบรมหลักสูตร การพยาบาลเฉพาะทาง สาขาการพยาบาลผู้ใช้ยาและสารเสพติดในเขตบริการสุขภาพ',responsible:['พว.อัญชลี เจตวรานนท์','พว.รัชณีย์ วรรณขาม','พว.ธัญญาภรณ์ อุปมัยรัตน์'],budget:237750,level:4,progress:75,status:'ดำเนินการสำเร็จตามห้วงเวลา'},
+  {id:2,unit:'กลุ่มงานวิชาการพยาบาล',name:'โครงการนำเสนอผลงานวิชาการในเวทีการประชุมนานาชาติ ประจำปีงบประมาณ พ.ศ. 2569',responsible:['พว.รัชณีย์ วรรณขาม','พว.ไกรวุฒิ ศรีจันทร์'],budget:202000,level:2,progress:0,status:'อยู่ระหว่างรอการอนุมัติจากกรมฯ'},
+  {id:3,unit:'กลุ่มงานการพยาบาลผู้ป่วยนอก',name:'โครงการพัฒนาแนวทางการดูแลเยาวชนแบบองค์รวม (วัยใส SAY NO Plus) ประจำปีงบประมาณ พ.ศ. 2569',responsible:['พว.นูรฮายาตี มีเหาะ','พว.ปรีชา ประเสริฐศิลป์','พว.อาซียะ ดอเลาะ'],budget:159700,level:4,progress:75,status:'ดำเนินการสำเร็จตามห้วงเวลา'},
+  {id:4,unit:'กลุ่มงานวิชาการพยาบาล',name:'โครงการพัฒนานวัตกรรมทางการพยาบาลในการดูแลผู้ใช้ยาและสารเสพติด (Nursing Innovation Journey)',responsible:['พว.ไกรวุฒิ ศรีจันทร์','พว.กิ่งกมล เตี้นวล','พว.พาตีเมาะ เจ๊ะเลาะ'],budget:49750,level:4,progress:75,status:'ดำเนินการสำเร็จตามห้วงเวลา'},
+  {id:5,unit:'กลุ่มงานวิชาการพยาบาล',name:'โครงการหลักสูตรประกาศนียบัตรพนักงานให้การดูแล สาขาผู้ป่วยและผู้ใช้สารเสพติด (หลักสูตรใหม่) พ.ศ.2569',responsible:['พว.รัชณีย์ วรรณขาม','พว.ธัญญาภรณ์ อุปมัยรัตน์','พว.ไกรวุฒิ ศรีจันทร์'],budget:77790,level:3,progress:50,status:'ปรับแผน อยู่ระหว่างเสนอกรมฯ'},
+  {id:6,unit:'งานการพยาบาลผู้ป่วยในบำบัดยา',name:'โครงการอบรมเชิงปฏิบัติการการช่วยชีวิตภาวะหัวใจหยุดเต้น (CPR) ประจำปีงบประมาณ พ.ศ. 2569',responsible:['พว.ยุพาพันธ์ ประเสริฐ์ศิลป์','พว.เจ๊ะแวซง โต๊ะแวมะ','พว.ประภามาส ชัยชนะ'],budget:24000,level:3,progress:50,status:'ดำเนินการสำเร็จตามห้วงเวลา'},
+  {id:7,unit:'งานการพยาบาลผู้ป่วยในฟื้นฟูสมรรถภาพ',name:'โครงการอบรมเชิงปฏิบัติการการจำกัดพฤติกรรมผู้ป่วยยาเสพติดที่มีพฤติกรรมก้าวร้าวรุนแรง ประจำปีงบประมาณ 2569',responsible:['พว.ยุวารีหย๊ะ มะแซ','พว.ศักรินทร์ คงหนู','พว.นีด๊ะ มูซอ'],budget:15600,level:3,progress:75,status:'ดำเนินการสำเร็จตามห้วงเวลา'},
+  {id:8,unit:'งานการพยาบาลผู้ป่วยในฟื้นฟูสมรรถภาพ',name:'โครงการอบรมเชิงปฏิบัติการการสร้างความสัมพันธ์ในครอบครัว คือพลังต้านยาเสพติด ประจำปีงบประมาณ 2569',responsible:['พว.อิสมาแอ ดาแซ','พว.รูไซดะ เจ็ะเด็ง','พว.กมลวรรณ ศรีเฉลิม'],budget:9200,level:3,progress:75,status:'ดำเนินการสำเร็จตามห้วงเวลา'},
+  {id:9,unit:'งานการพยาบาลผู้ป่วยในบำบัดยา',name:'โครงการอบรมเชิงปฏิบัติการนวดแผนไทยในระยะบำบัดยา',responsible:['พว.อภิรักษ์ แก้วอุทัย','พว.วรารัตน์ แดงวรวิทย์','พว.พารีด๊ะ สันนก'],budget:19100,level:3,progress:50,status:'ดำเนินการสำเร็จตามห้วงเวลา'},
+  {id:10,unit:'กลุ่มงานการพยาบาลผู้ป่วยใน',name:'โครงการอบรมเชิงปฏิบัติการฟื้นฟูความรู้มาตรฐานการพยาบาล เพื่อรองรับการประกันคุณภาพการพยาบาล รพ.ธัญญารักษ์ปัตตานี 2569',responsible:['พว.รอดีหย๊ะ เจ๊ะโซ๊ะ','พว.รอฎียะ เจ๊ะเฮง','พว.นารีมาลย์ ปาแย'],budget:76800,level:4,progress:50,status:'ดำเนินการสำเร็จตามห้วงเวลา'},
+  {id:11,unit:'กลุ่มงานการพยาบาลผู้ป่วยใน',name:'โครงการ "93 สุขภาวะไทย ใกล้ใจ เลิกเหล้า ถวายพระพันปีหลวง"',responsible:['พว.รอดีหย๊ะ เจ๊ะโซ๊ะ','พว.แวมารีหย๊ะ นีระฮิง','พว.อภิชญา หนูทอง'],budget:25670,level:4,progress:25,status:'ดำเนินการสำเร็จตามห้วงเวลา'},
+];
+
+// ═══════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════
+const fmt = n => n.toLocaleString('th-TH');
+const now = new Date();
+const dateStr = now.toLocaleDateString('th-TH',{day:'2-digit',month:'long',year:'numeric'});
+document.getElementById('dt-display').textContent = dateStr;
+document.getElementById('ft-date').textContent = dateStr;
+
+// Status mapping
+function statusBadge(s) {
+  if (s.includes('สำเร็จ')) return `<span class="status-badge sb-success">✅ สำเร็จตามห้วงเวลา</span>`;
+  if (s.includes('รอการอนุมัติ') || s.includes('อยู่ระหว่างรอ')) return `<span class="status-badge sb-info">⏳ รอการอนุมัติจากกรมฯ</span>`;
+  if (s.includes('ปรับแผน')) return `<span class="status-badge sb-warning">⚠️ ปรับแผน</span>`;
+  return `<span class="status-badge sb-info">${s}</span>`;
+}
+function progressClass(p) {
+  if (p >= 75) return 'fill-green';
+  if (p >= 50) return 'fill-yellow';
+  if (p >= 25) return 'fill-blue';
+  return 'fill-red';
+}
+function levelClass(l) {
+  return ['','lv1','lv2','lv3','lv4','lv5'][l] || 'lv1';
+}
+
+// ═══════════════════════════════════════════
+// ALERT
+// ═══════════════════════════════════════════
+const alerts = PROJECTS.filter(p => !p.status.includes('สำเร็จ'));
+if (alerts.length === 0) {
+  document.getElementById('alertStrip').style.display = 'none';
+} else {
+  document.getElementById('alertMsg').innerHTML = alerts.map(a =>
+    `<b>โครงการ ${a.id}:</b> ${a.name.substring(0,50)}... (${a.status})`
+  ).join(' | ');
+}
+
+// ═══════════════════════════════════════════
+// FILTER DROPDOWNS
+// ═══════════════════════════════════════════
+const units = [...new Set(PROJECTS.map(p=>p.unit))];
+const uSel = document.getElementById('fUnit');
+units.forEach(u=>{const o=document.createElement('option');o.value=u;o.textContent=u;uSel.appendChild(o);});
+
+// ═══════════════════════════════════════════
+// TABLE RENDER
+// ═══════════════════════════════════════════
+function renderTable(data) {
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+  document.getElementById('rowCount').textContent = data.length;
+  data.forEach(p => {
+    const fillCls = progressClass(p.progress);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="td-id">${p.id}</td>
+      <td class="td-name">${p.name.substring(0,85)}${p.name.length>85?'...':''}</td>
+      <td class="td-unit">${p.unit}</td>
+      <td style="font-size:11px;color:var(--text-sub);max-width:160px;line-height:2.0;">${p.responsible.map(r=>`<span style="display:block;">• ${r}</span>`).join('')}</td>
+      <td class="td-budget">${fmt(p.budget)}</td>
+      <td class="td-level"><span class="level-badge ${levelClass(p.level)}">${p.level}</span></td>
+      <td>
+        <div class="mini-bar">
+          <div class="mini-track"><div class="mini-fill ${fillCls}" style="width:${p.progress}%"></div></div>
+          <span class="mini-pct" style="color:${p.progress>=75?'#1e8f5e':p.progress>=50?'#d97706':'#c0392b'}">${p.progress}%</span>
+        </div>
+      </td>
+      <td>${statusBadge(p.status)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// ═══════════════════════════════════════════
+// FILTER LOGIC
+// ═══════════════════════════════════════════
+function applyFilters() {
+  const q = document.getElementById('searchBox').value.toLowerCase();
+  const u = document.getElementById('fUnit').value;
+  const s = document.getElementById('fStatus').value;
+  const l = document.getElementById('fLevel').value;
+  const filtered = PROJECTS.filter(p => {
+    if (q && !p.name.toLowerCase().includes(q) && !p.unit.toLowerCase().includes(q)) return false;
+    if (u && p.unit !== u) return false;
+    if (s && !p.status.includes(s)) return false;
+    if (l && p.level !== parseInt(l)) return false;
+    return true;
+  });
+  renderTable(filtered);
+}
+function resetFilters() {
+  document.getElementById('searchBox').value='';
+  document.getElementById('fUnit').value='';
+  document.getElementById('fStatus').value='';
+  document.getElementById('fLevel').value='';
+  renderTable(PROJECTS);
+}
+renderTable(PROJECTS);
+
+// ═══════════════════════════════════════════
+// BUDGET PROGRESS LIST
+// ═══════════════════════════════════════════
+const totalBudget = PROJECTS.reduce((s,p)=>s+p.budget,0);
+const bList = document.getElementById('budgetProgressList');
+// Show top 7 by budget
+const sorted = [...PROJECTS].sort((a,b)=>b.budget-a.budget).slice(0,7);
+sorted.forEach(p => {
+  const pct = ((p.budget/totalBudget)*100).toFixed(1);
+  const fillCls = pct >= 20 ? 'fill-red' : pct >= 10 ? 'fill-yellow' : 'fill-green';
+  bList.innerHTML += `
+    <div class="bgt-row">
+      <div class="bgt-hdr">
+        <span class="bgt-name">โครงการ ${p.id}: ${p.name.substring(0,40)}...</span>
+        <span class="bgt-pct" style="color:var(--navy-mid)">${pct}%</span>
+      </div>
+      <div class="bgt-track"><div class="bgt-fill ${fillCls}" style="width:${pct}%"></div></div>
+      <div class="bgt-amts"><span>${fmt(p.budget)} บาท</span><span>จาก ${fmt(totalBudget)} บาท</span></div>
+    </div>
+  `;
+});
+
+// ═══════════════════════════════════════════
+// CHART.JS CHARTS
+// ═══════════════════════════════════════════
+Chart.defaults.font.family = "'Sarabun', sans-serif";
+Chart.defaults.color = '#5a6d8a';
+
+// 1. Donut
+new Chart(document.getElementById('donutChart'),{
+  type:'doughnut',
+  data:{
+    labels:['ดำเนินการสำเร็จ','รอการอนุมัติ','ปรับแผน'],
+    datasets:[{data:[9,1,1],backgroundColor:['#1e8f5e','#d97706','#c0392b'],borderWidth:0,hoverOffset:6}]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:true,
+    cutout:'70%',
+    plugins:{legend:{display:false},tooltip:{
+      callbacks:{label:c=>`${c.label}: ${c.parsed} โครงการ`}
+    }},
+    animation:{animateRotate:true,duration:1000}
+  }
+});
+
+// 2. Level Bar
+const levelCounts = [0,0,0,0,0];
+PROJECTS.forEach(p=>{ if(p.level>=1&&p.level<=5) levelCounts[p.level-1]++; });
+new Chart(document.getElementById('levelChart'),{
+  type:'bar',
+  data:{
+    labels:['ระดับ 1','ระดับ 2','ระดับ 3','ระดับ 4','ระดับ 5'],
+    datasets:[{
+      label:'จำนวนโครงการ',
+      data:levelCounts,
+      backgroundColor:['#e5e7eb','#93c5fd','#fbbf24','#6ee7b7','#34d399'],
+      borderRadius:6,borderSkipped:false,
+    }]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{
+      y:{grid:{color:'#eef1f7'},ticks:{stepSize:1},beginAtZero:true,max:8},
+      x:{grid:{display:false}}
+    },
+    animation:{duration:1000}
+  }
+});
+
+// 3. Budget Bar (top 6)
+const topBudget = [...PROJECTS].sort((a,b)=>b.budget-a.budget).slice(0,6);
+new Chart(document.getElementById('budgetChart'),{
+  type:'bar',
+  data:{
+    labels:topBudget.map(p=>`P${p.id}`),
+    datasets:[{
+      label:'งบประมาณ (บาท)',
+      data:topBudget.map(p=>p.budget),
+      backgroundColor:'rgba(30,115,210,0.15)',
+      borderColor:'rgba(30,115,210,0.8)',
+      borderWidth:2,
+      borderRadius:6,borderSkipped:false,
+    }]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{
+      legend:{display:false},
+      tooltip:{callbacks:{label:c=>`${fmt(c.parsed.y)} บาท`}}
+    },
+    scales:{
+      y:{grid:{color:'#eef1f7'},ticks:{callback:v=>`${(v/1000).toFixed(0)}K`},beginAtZero:true},
+      x:{grid:{display:false}}
+    },
+    animation:{duration:1000}
+  }
+});
+
+// 4. Unit Pie (small)
+const unitMap = {};
+PROJECTS.forEach(p=>{
+  const k = p.unit.replace('กลุ่มงาน','').replace('งาน','');
+  unitMap[k] = (unitMap[k]||0) + p.budget;
+});
+new Chart(document.getElementById('unitPieChart'),{
+  type:'doughnut',
+  data:{
+    labels:Object.keys(unitMap),
+    datasets:[{
+      data:Object.values(unitMap),
+      backgroundColor:['#1e4280','#1e73d2','#3a9bd5','#6cbce8','#a8d8f0'],
+      borderWidth:0
+    }]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    cutout:'60%',
+    plugins:{
+      legend:{display:true,position:'right',labels:{font:{size:9},boxWidth:8,padding:4}},
+      tooltip:{callbacks:{label:c=>`${fmt(c.parsed)} บาท`}}
+    }
+  }
+});
+
+// ─────────────────────────────────────────
+// Auto refresh simulation indicator
+let sec = 300;
+setInterval(()=>{
+  sec--;
+  if(sec<=0){ sec=300; }
+  document.getElementById('dt-display').textContent = dateStr;
+},1000);
+</script>
+</body>
+</html>
